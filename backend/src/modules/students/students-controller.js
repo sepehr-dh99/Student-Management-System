@@ -8,36 +8,52 @@ const {
 } = require("./students-service");
 
 const handleGetAllStudents = asyncHandler(async (req, res) => {
-  const { userId, roleId, name } = req.query;
-  const students = await getAllStudents({ userId, roleId, name });
-  res.json({ students });
+  const students = await getAllStudents(req.query);
+  res.status(200).json({
+    success: true,
+    data: students,
+  });
 });
 
 const handleAddStudent = asyncHandler(async (req, res) => {
-  const payload = req.body;
-  const message = await addNewStudent(payload);
-  res.json(message);
+  const result = await addNewStudent(req.body);
+  res.status(201).json({
+    success: true,
+    message: result.message,
+  });
 });
 
 const handleUpdateStudent = asyncHandler(async (req, res) => {
-  const { id: userId } = req.params;
-  const payload = req.body;
-  const message = await updateStudent({ ...payload, userId });
-  res.json(message);
+  const payload = {
+    ...req.body,
+    id: req.params.id,
+  };
+  const result = await updateStudent(payload);
+  res.status(200).json({
+    success: true,
+    message: result.message,
+  });
 });
 
 const handleGetStudentDetail = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-  const student = await getStudentDetail(id);
-  res.json(student);
+  const student = await getStudentDetail(req.params.id);
+  res.status(200).json({
+    success: true,
+    data: student,
+  });
 });
 
 const handleStudentStatus = asyncHandler(async (req, res) => {
-  const { id: userId } = req.params;
-  const { id: reviewerId } = req.user;
-  const { status } = req.body;
-  const message = await setStudentStatus({ userId, reviewerId, status });
-  res.json(message);
+  const payload = {
+    userId: req.params.id,
+    reviewerId: req.user.id, // Assuming authenticated user's id is available in req.user
+    status: req.body.status,
+  };
+  const result = await setStudentStatus(payload);
+  res.status(200).json({
+    success: true,
+    message: result.message,
+  });
 });
 
 module.exports = {
